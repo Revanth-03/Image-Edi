@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Canvas Editor</title>
+    <link rel="stylesheet" href="styles.css" />
+    <style>
+      /* Add your styles here */
+      #canvasContainer {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+      }
+      canvas {
+        border: 1px solid #ccc;
+      }
+      button {
+        margin: 5px;
+      }
+      .buttons {
+        border: none;
+        border-radius: 5px;
+        background-color: black;
+        color: aqua;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="canvasContainer">
+      <button id="backButton" class="buttons">Back to Search</button>
+      <canvas id="imageCanvas" width="800" height="600"></canvas>
+      <div class="buttons-wrapper">
+        <button id="addTextButton" class="buttons">Add Text</button>
+        <button id="addRectangleButton" class="buttons">Add Rectangle</button>
+        <button id="addCircleButton" class="buttons">Add Circle</button>
+        <button id="addTriangleButton" class="buttons">Add Triangle</button>
+        <button id="addPolygonButton" class="buttons">Add Polygon</button>
+        <button id="downloadButton" class="buttons">Download Image</button>
+      </div>
+    </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/4.4.0/fabric.min.js"></script>
+    <script>
+      const urlParams = new URLSearchParams(window.location.search);
+      const imageUrl = urlParams.get("imageUrl");
+
+      const canvas = new fabric.Canvas("imageCanvas");
+
+      if (imageUrl) {
+        fabric.Image.fromURL(imageUrl, (img) => {
+          canvas.add(img.set({ left: 0, top: 0 }));
+          img.scaleToWidth(canvas.width);
+          canvas.renderAll();
+        });
+      }
+
+      function setupCanvasControls() {
+        document
+          .getElementById("addTextButton")
+          .addEventListener("click", () => {
+            const text = new fabric.Textbox("Editable Text", {
+              left: 50,
+              top: 50,
+              width: 200,
+              fontSize: 20,
+              editable: true,
+            });
+            canvas.add(text);
+            canvas.setActiveObject(text);
+          });
+
+        document
+          .getElementById("addRectangleButton")
+          .addEventListener("click", () => {
+            const rect = new fabric.Rect({
+              left: 100,
+              top: 100,
+              fill: "rgba(0,0,255,0.5)",
+              width: 100,
+              height: 100,
+            });
+            canvas.add(rect);
+            canvas.setActiveObject(rect);
+          });
+
+        document
+          .getElementById("addCircleButton")
+          .addEventListener("click", () => {
+            const circle = new fabric.Circle({
+              left: 200,
+              top: 200,
+              radius: 50,
+              fill: "rgba(0,255,0,0.5)",
+            });
+            canvas.add(circle);
+            canvas.setActiveObject(circle);
+          });
+
+        document
+          .getElementById("addTriangleButton")
+          .addEventListener("click", () => {
+            const triangle = new fabric.Triangle({
+              left: 300,
+              top: 300,
+              width: 100,
+              height: 100,
+              fill: "rgba(255,0,0,0.5)",
+            });
+            canvas.add(triangle);
+            canvas.setActiveObject(triangle);
+          });
+
+        document
+          .getElementById("addPolygonButton")
+          .addEventListener("click", () => {
+            const polygon = new fabric.Polygon(
+              [
+                { x: 50, y: 0 },
+                { x: 100, y: 50 },
+                { x: 80, y: 100 },
+                { x: 20, y: 100 },
+                { x: 0, y: 50 },
+              ],
+              {
+                left: 400,
+                top: 400,
+                fill: "rgba(255,255,0,0.5)",
+              }
+            );
+            canvas.add(polygon);
+            canvas.setActiveObject(polygon);
+          });
+
+        // if you download canvas without image it works open canvas.html in bowser then download.
+        // image you are downloding from Pixabay does not have the correct CORS headers, causing the canvas to become tainted. Unfortunately, when the canvas is tainted, the toDataURL method (which converts the canvas content to an image) cannot be used due to security restrictions.
+        document
+          .getElementById("downloadButton")
+          .addEventListener("click", () => {
+            const dataURL = canvas.toDataURL("image/png");
+            const link = document.createElement("a");
+            link.href = dataURL;
+            link.download = "modified-image.png";
+            link.click();
+          });
+        document.getElementById("backButton").addEventListener("click", () => {
+          window.location.href = "index.html";
+        });
+      }
+
+      setupCanvasControls();
+    </script>
+  </body>
+</html>
